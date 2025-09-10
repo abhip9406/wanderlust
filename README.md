@@ -9,7 +9,7 @@ A full-stack travel listing website where users can post, edit, delete listings 
 - EJS for templating
 
 ## Live Site
-https://wanderlust-y24s.onrender.com
+[View Live on Render](https://wanderlust-y24s.onrender.com/listings)
 
 ## Installation (for developers)
 ```bash
