@@ -21,8 +21,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.ATLASDB_URL;
-
+const dbUrl = process.env.MONGO_URI;
 
 main()
   .then(() => {
@@ -44,6 +43,15 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
+  );
+  next();
+});
+
+
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
@@ -52,7 +60,7 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
+store.on("error", (err) => {
     console.log("ERROR in MONGO SESSION STORE", err);
 });
 
@@ -100,7 +108,6 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", {message});
     // res.status(statusCode).send(message);
 });
-
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
