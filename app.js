@@ -44,16 +44,17 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 app.use((req, res, next) => {
-    res.setHeader(
-        "Content-Security-Policy",
-        "default-src 'self'; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.maptiler.com; " +
-        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.maptiler.com; " +
-        "img-src 'self' data: https:; " +
-        "connect-src 'self' https://cdn.maptiler.com https://api.maptiler.com;"
-    );
-    next();
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.maptiler.com; " +
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.maptiler.com; " +
+    "worker-src 'self' blob:; " +
+    "img-src 'self' data: https:; " +
+    "connect-src 'self' https://cdn.maptiler.com https://api.maptiler.com https://cdn.jsdelivr.net;"
+  );
+  next();
 });
 
 
