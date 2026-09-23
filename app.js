@@ -1,4 +1,4 @@
-if(process.env.NODE_ENV != "production") {
+if (process.env.NODE_ENV != "production") {
     require('dotenv').config();
 }
 
@@ -21,16 +21,15 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.ATLASDB_URL;
-
+const dbUrl = process.env.MONGO_URI;
 
 main()
-  .then(() => {
-    console.log("Connected to DB");
-})
-.catch((err) => {
-    console.log(err);
-});
+    .then(() => {
+        console.log("Connected to DB");
+    })
+    .catch((err) => {
+        console.log(err);
+    });
 
 async function main() {
     await mongoose.connect(dbUrl);
@@ -44,6 +43,20 @@ app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
+app.use((req, res, next) => {
+    res.setHeader(
+        "Content-Security-Policy",
+        "default-src 'self'; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.maptiler.com; " +
+        "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; " +
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.maptiler.com; " +
+        "img-src 'self' data: https:; " +
+        "connect-src 'self' https://cdn.maptiler.com https://api.maptiler.com;"
+    );
+    next();
+});
+
+
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
@@ -52,7 +65,7 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
+store.on("error", (err) => {
     console.log("ERROR in MONGO SESSION STORE", err);
 });
 
@@ -92,15 +105,14 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.use((req, res, next) => {
-  next(new ExpressError(404, "Page Not Found!"));
+    next(new ExpressError(404, "Page Not Found!"));
 });
 
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong!" } = err;
-    res.status(statusCode).render("error.ejs", {message});
+    res.status(statusCode).render("error.ejs", { message });
     // res.status(statusCode).send(message);
 });
-
 
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
